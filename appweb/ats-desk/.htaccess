@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^logout.html$ logout.php [L]
+RewriteRule ^dashboard.html$ halaman.php?module=dashboard [L]
+RewriteRule ^survei-ats.html$ halaman.php?module=survei-ats [L]
+RewriteRule ^laporan-survei.html$ laporan-survei.php?module=laporan-survei [L]
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes

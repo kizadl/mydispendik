@@ -1,0 +1,44 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^logout.html$ logout.php [L]
+
+RewriteRule ^dashboard.html$ layanan.php?module=dashboard [L]
+RewriteRule ^dashboard-pengaduan.html$ layanan.php?module=dashboardpengaduan [L]
+RewriteRule ^mutasi-siswa.html$ layanan.php?module=mutasisiswa [L]
+RewriteRule ^verifikasi-pdb-mi.html$ layanan.php?module=verifikasipdbmi [L]
+RewriteRule ^mutasi-tenaga-pendidik.html$ layanan.php?module=mutasitenagapendidik [L]
+RewriteRule ^pergantian-kepsek.html$ layanan.php?module=pergantiankepsek [L]
+RewriteRule ^perubahan-ptk.html$ layanan.php?module=perubahanptk [L]
+RewriteRule ^pengajuan-npsn.html$ layanan.php?module=pengajuannpsn [L]
+RewriteRule ^pengajuan-akun-operator.html$ layanan.php?module=akunoperator [L]
+RewriteRule ^pengajuan-npyp.html$ layanan.php?module=pengajuannpyp [L]
+
+RewriteRule ^pengaduan-paud.html$ layanan.php?module=pengaduanpaud [L]
+RewriteRule ^pengaduan-sd.html$ layanan.php?module=pengaduansd [L]
+RewriteRule ^pengaduan-smp.html$ layanan.php?module=pengaduansmp [L]
+RewriteRule ^pengaduan-pnf.html$ layanan.php?module=pengaduanpnf [L]
+RewriteRule ^klinik-(.*)\.html$ aksi/trans-layanan/pengaduan-dapodik/tampilkan-surat-pdf.php?mdidtransaksi=$1 [L]
+
+RewriteRule ^bidang.html$ layanan.php?module=bidang [L]
+RewriteRule ^seksi.html$ layanan.php?module=seksi [L]
+RewriteRule ^persyaratan.html$ layanan.php?module=persyaratan [L]
+RewriteRule ^operator.html$ layanan.php?module=operator [L]
+
+RewriteRule ^print-surat-(.*)\.html$ aksi/trans-layanan/mutasi-siswa/print-mutasi-siswa.php?mdidtransaksi=$1 [L]
+RewriteRule ^tampilkan-(.*)\.html$ aksi/trans-layanan/mutasi-siswa/tampilkan-surat-pdf.php?mdidtransaksi=$1 [L]
+RewriteRule ^syarat-(.*)-(.*)-(.*)\.html$ tampilkan-persyaratan.php?idlayanan=$1&idtransaksi=$2&kdsyarat=$3 [L]
+RewriteRule ^printsuratpdf-(.*)\.html$ aksi/trans-layanan/mutasi-siswa/print-mutasi-siswa-html2pdf.php?idtransaksi=$1 [L]
+
+RewriteRule ^rekomendasi-(.*)\.html$ tampilkan-rekomendasi.php?kdsurat=$1 [L]
+
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes

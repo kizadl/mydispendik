@@ -1,0 +1,40 @@
+<?php
+error_reporting(0);
+include '../../services/config.php';
+$dbconn = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname)or die('Could not connect: '); 
+
+$sqlx = ("SELECT p.id_layanan,p.layanan,p.awal_no_surat,p.no_urut,p.akhir_no_surat,p.ket_layanan
+		FROM tte_m_layanan p 
+		ORDER BY p.id_layanan ASC");			
+$result = mysqli_query($dbconn,$sqlx);
+$data = array();
+$no=0;
+while($t=mysqli_fetch_array($result)){
+	$no++;	 	
+	if ($t['ket_layanan'] == "surat"){
+		$nosurat = $t['awal_no_surat'].$t['no_urut'].$t['akhir_no_surat'];
+	} else if ($t['ket_layanan'] == "upload"){
+		$nosurat ="";
+	}
+
+	$sqldet = ("SELECT persyaratan,mode_upload
+		FROM tte_m_persyaratan WHERE id_layanan = '".$t['id_layanan']."' ORDER BY id_persyaratan ASC");			
+	$resultdet = mysqli_query($dbconn,$sqldet);
+	$nod=0;$listpersyaratan ="";
+	while($s=mysqli_fetch_array($resultdet)){
+		$nod++;
+		$listpersyaratan = $listpersyaratan.$nod.". ".ucwords(strtolower($s['persyaratan']))." (".ucwords(strtolower($s['mode_upload'])).")<br>";
+	}
+
+	$row_array = array();
+	$row_array['no']=$no;
+	$row_array['kdlayanan']=$t['id_layanan'];
+	$row_array['nmlayanan']=$t['layanan'];$row_array['ketlayanan']=$t['ket_layanan'];
+	$row_array['nmpersyaratan']=$listpersyaratan;	
+	$row_array['nosurat']=$nosurat;	
+	array_push($data,$row_array);
+}
+echo json_encode($data);
+$result->close();$resultdet->close();
+$dbconn->close();
+?>  

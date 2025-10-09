@@ -1,0 +1,42 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^logout.html$ logout.php [L]
+RewriteRule ^dashboard.html$ dashboard.php?module=dashboard [L]
+RewriteRule ^profil-media.html$ home.php?module=profil [L]
+RewriteRule ^media-upload.html$ home.php?module=media-upload [L]
+RewriteRule ^upload-video.html$ home.php?module=upload-video [L]
+RewriteRule ^upload-sarana.html$ home.php?module=upload-sarana [L]
+
+RewriteRule ^kegiatan-sekolah.html$ home.php?module=kegiatan-sekolah [L]
+
+RewriteRule ^mutasi-siswa.html$ home.php?module=mutasisiswa [L]
+RewriteRule ^verifikasi-pdb-mi.html$ home.php?module=verifikasipdbmi [L]
+RewriteRule ^mutasi-tenaga-pendidik.html$ home.php?module=mutasitenagapendidik [L]
+RewriteRule ^pergantian-kepsek.html$ home.php?module=pergantiankepsek [L]
+RewriteRule ^perubahan-ptk.html$ home.php?module=perubahanptk [L]
+RewriteRule ^pengajuan-npsn.html$ home.php?module=pengajuannpsn [L]
+RewriteRule ^pengajuan-akun-operator.html$ home.php?module=akunoperator [L]
+RewriteRule ^pengajuan-npyp.html$ home.php?module=pengajuannpyp [L]
+
+RewriteRule ^pengaduan-dapodik.html$ home.php?module=pengaduandapodik [L]
+
+RewriteRule ^print-surat-(.*)\.html$ klinik-dapo/trans-layanan/mutasi-siswa/print-mutasi-siswa.php?mdidtransaksi=$1 [L]
+RewriteRule ^tampilkan-(.*)\.html$ klinik-dapo/trans-layanan/mutasi-siswa/tampilkan-surat-pdf.php?mdidtransaksi=$1 [L]
+RewriteRule ^syarat-(.*)-(.*)-(.*)\.html$ tampilkan-persyaratan.php?idlayanan=$1&idtransaksi=$2&kdsyarat=$3 [L]
+RewriteRule ^printsuratpdf-(.*)\.html$ klinik-dapo/trans-layanan/mutasi-siswa/print-mutasi-siswa-html2pdf.php?idtransaksi=$1 [L]
+RewriteRule ^klinik-(.*)\.html$ klinik-dapo/trans-layanan/pengaduan-dapodik/tampilkan-surat-pdf.php?mdidtransaksi=$1 [L]
+
+RewriteRule ^sk-(.*)-(.*)\.html$ tampilkan-sk-pdf.php?mdsekolah=$1&mdptk=$2 [L]
+RewriteRule ^detail-ptk-(.*)\.html$ aksi/lap-excel/excel_lap_detail_sekolah_ptk.php?idsekolah=$1 [L]
+
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes

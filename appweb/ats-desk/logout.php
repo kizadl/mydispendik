@@ -1,0 +1,12 @@
+<?php
+session_start();
+unset($_SESSION['IDUSERDESK']); 
+unset($_SESSION['USERNAME']); 
+unset($_SESSION['NMOPERATORDESK']);
+session_destroy(); 
+echo"
+<script>
+window.location='../home.html';
+</script>";
+exit; 
+?>

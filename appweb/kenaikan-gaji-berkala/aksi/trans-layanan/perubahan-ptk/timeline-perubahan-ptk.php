@@ -1,0 +1,270 @@
+<?php
+error_reporting(0);
+require_once '../../../../services/config.php';
+$dbconn = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname) or die('Could not connect: ');
+date_default_timezone_set('Asia/Jakarta');
+function tgl_indo($tgl)
+{
+  $tanggal = substr($tgl, 8, 2);
+  $bulan = getBulan(substr($tgl, 5, 2));
+  $tahun = substr($tgl, 0, 4);
+  return $tanggal . ' ' . $bulan . ' ' . $tahun;
+}
+
+function getBulan($bln)
+{
+  switch ($bln) {
+    case 1:
+      return "Januari";
+      break;
+    case 2:
+      return "Februari";
+      break;
+    case 3:
+      return "Maret";
+      break;
+    case 4:
+      return "April";
+      break;
+    case 5:
+      return "Mei";
+      break;
+    case 6:
+      return "Juni";
+      break;
+    case 7:
+      return "Juli";
+      break;
+    case 8:
+      return "Agustus";
+      break;
+    case 9:
+      return "September";
+      break;
+    case 10:
+      return "Oktober";
+      break;
+    case 11:
+      return "November";
+      break;
+    case 12:
+      return "Desember";
+      break;
+  }
+}
+
+$idtransaksi = trim($_POST['idtransaksi']);
+
+$sqlx = ("SELECT p.nama,p.nik,p.nip,p.nuptk,p.nm_sekolah,p.npsn,p.no_wa,
+	p.ijazah_s1,p.nm_pt,p.prog_studi,p.no_ijazah,p.thn_lulus,p.id_layanan,
+  p.stts_opt_sekolah,p.waktu_opt_sekolah,p.stts_opt_dapodik,p.waktu_opt_dapodik,p.nm_operator_dapodik,
+  p.ket_level
+  FROM tte_trans_perubahan_ptk p
+  WHERE p.id_transaksi='" . $idtransaksi . "'");
+$restps = mysqli_query($dbconn, $sqlx);
+$sm = mysqli_fetch_assoc($restps);
+
+$nmkepsek = $sm['nama'];
+$nik = $sm['nik'];
+$nip = strtoupper($sm['nip']);
+$nuptk = strtoupper($sm['nuptk']);
+$nmsekolahasal = strtoupper($sm['nm_sekolah']);
+$npsnasal = strtoupper($sm['npsn']);
+$noWA = $sm['no_wa'];
+
+$ijazahs1 = $sm['ijazah_s1'];
+if ($ijazahs1 == "Y"){
+    $hidpendidikan = ""; 
+    $namapt = ucwords(strtolower($sm['nm_pt']));
+    $progstudy = ucwords(strtolower($sm['prog_studi']));
+    $noijazah = strtoupper($sm['no_ijazah']);
+    $thnlulus = $sm['thn_lulus'];
+} else if ($ijazahs1 == "N"){
+    $hidpendidikan = "display:none"; 
+    $namapt = "";
+    $progstudy = "";
+    $noijazah = "";
+    $thnlulus = "";
+}
+
+$nmoperatordapodik=ucwords(strtolower($sm['nm_operator_dapodik'] ?? ''));
+
+/////// DETAIL TOLAK ///////////
+$sqltolak = ("SELECT catatan_tolak,ket_level,waktu_tolak,status_akhir
+		FROM tte_detail_tolak WHERE id_transaksi='" . $idtransaksi . "' AND id_layanan='" . $sm['id_layanan'] . "'");
+$resulttolak = mysqli_query($dbconn, $sqltolak);
+$catatantolak2 = "";
+$tgltolak2 = "";
+$jamtolak2 = "";
+
+$hidtolak2 = "display:none !important";
+$notl = 0;
+while ($t = mysqli_fetch_array($resulttolak)) {
+  $notl++;
+  $ketleveltolak = $t['ket_level'];
+  if ($ketleveltolak == "operator dapodik") {
+    $catatantolak2 = $catatantolak2.$notl.". ". $t['catatan_tolak']."<br>";
+    $hidtolak2 = "";
+    $tgltolak2 = tgl_indo($t['waktu_tolak']);
+    $jamtolak2 = date("H:i", strtotime($t['waktu_tolak']));
+  }
+}
+////////////////////////////////////////
+$sttslevel1 = ucwords(strtolower($sm['stts_opt_sekolah']));
+if ($sttslevel1 == "Terkirim") {
+  $dislevel1 = "";
+} else if ($sttslevel1 == "Belum") {
+  $dislevel1 = "display:none !important";
+}
+$tgllevel1 = tgl_indo($sm['waktu_opt_sekolah']);
+$jamlevel1 = date("H:i", strtotime($sm['waktu_opt_sekolah']));
+
+$sttslevel2 = ucwords(strtolower($sm['stts_opt_dapodik']));
+if ($sttslevel2 == "Terima") {
+  $dislevel2 = "";
+} else if ($sttslevel2 == "Belum") {
+  $dislevel2 = "display:none !important";
+}
+$tgllevel2 = tgl_indo($sm['waktu_opt_dapodik']);
+$jamlevel2 = date("H:i", strtotime($sm['waktu_opt_dapodik'] ?? ''));
+
+if ($sm['ket_level'] == "operator sekolah") {
+  $tandalevel1 = "timeline-success timeline-current";
+  $tandalevel2 = "timeline-primary";
+  $hidoptsekolah = "";$hidoptdapodik = "hidden";
+} else if ($sm['ket_level'] == "operator dapodik") {
+  $tandalevel1 = "timeline-primary timeline-current";
+  $tandalevel2 = "timeline-success timeline-current";
+  $hidoptsekolah = "";$hidoptdapodik = "";
+}
+mysqli_free_result($restps);mysqli_free_result($resulttolak);
+mysqli_close($dbconn);
+?>
+
+<div class="modal-header px-4 position-relative modal-shape-header bg-shape">
+  <div class="position-relative z-index-1 light">
+    <h5 class="mb-0 text-white">Timeline Status Perubahan Jenis PTK</h5>
+    <p class="fs--1 mb-0 text-white">Timeline Status Perubahan Jenis PTK</p>
+  </div>
+  <button class="btn-close btn-close-white position-absolute top-0 end-0 mt-2 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body bg-light py-3 px-4">
+
+  <div class="row mb-0 mt-2 g-3">
+    <div class="col-md-12 bg-light">
+      <div class="row g-3 timeline timeline-primary timeline-past pb-card">
+        <div class="col-auto ps-4 ms-2">
+          <div class="ps-2">
+            <div class="icon-item icon-item-sm rounded-circle bg-200 shadow-none"><span class="text-primary fas fa-user-tie"></span></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row gx-0 border-bottom pb-card">
+            <div class="col">
+              <h6 class="text-800 mb-2"><?php echo $nmkepsek ?></h6>
+ 
+              <table class="fs--1 text-800 mb-2">
+                <tr>
+                  <td width="140px">NIK</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $nik ?></td>
+                </tr>
+                <tr>
+                  <td width="140px" class="align-top">NIP</td>
+                  <td class="align-top">&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td class="align-top"><?php echo $nip ?></td>
+                </tr>
+                <tr>
+                  <td>NUPTK</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $nuptk ?></td>
+                </tr>
+                <tr>
+                  <td>Sekolah</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $nmsekolahasal ?></td>
+                </tr>
+                <tr>
+                  <td>NPSN</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $npsnasal ?></td>
+                </tr>
+                <tr>
+                  <td>No. HP (WA)</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><strong><?php echo $noWA ?></strong></td>
+                </tr>
+              </table>
+
+              <table class="fs--1 text-800 mb-0" style ="<?php echo $hidpendidikan ?>">
+                <tr>
+                  <td width="140px">Perguruan Tinggi</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $namapt ?></td>
+                </tr>
+                <tr>
+                  <td>Program Studi</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $progstudy ?></td>
+                </tr>
+                <tr>
+                  <td>Nomor Ijazah</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $noijazah ?></td>
+                </tr>
+                <tr>
+                  <td>Tahun Lulus</td>
+                  <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                  <td><?php echo $thnlulus ?></td>
+                </tr>
+              </table>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 timeline <?php echo $tandalevel1 ?> pb-card" <?php echo $hidoptsekolah ?>>
+        <div class="col-auto ps-4 ms-2">
+          <div class="ps-2">
+            <div class="icon-item icon-item-sm rounded-circle bg-200 shadow-none"><span class="text-primary fas fa-user-edit"></span></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row gx-0 border-bottom pb-card">
+            <div class="col">
+              <h6 class="text-800 mb-1">Operator Sekolah</h6>
+              <p class="fs--1 text-800 mb-0" style="<?php echo $dislevel1 ?>"><?php echo $tgllevel1 ?> &nbsp; - &nbsp; Jam <?php echo $jamlevel1 ?></p>
+              <p class="fs--1 text-800 mb-0">Status <?php echo $sttslevel1 ?></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 timeline <?php echo $tandalevel2 ?> pb-card" <?php echo $hidoptdapodik ?>>
+        <div class="col-auto ps-4 ms-2">
+          <div class="ps-2">
+            <div class="icon-item icon-item-sm rounded-circle bg-200 shadow-none"><span class="text-primary fas fa-chalkboard-teacher"></span></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row gx-0">
+            <div class="col">
+              <h6 class="text-800 mb-1">Operator Dapodik</h6>
+              <p class="fs--1 text-800 mb-0" style="<?php echo $dislevel2 ?>"><?php echo $nmoperatordapodik ?><br/><?php echo $tgllevel2 ?> Jam <?php echo $jamlevel2 ?></p>
+              <p class="fs--1 text-800 mb-0">Status <?php echo $sttslevel2 ?></p>
+              <p class="fs--1 mt-2 mb-0" style="<?php echo $hidtolak2 ?>"><strong>Catatan :</strong><br><?php echo $catatantolak2 ?></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<div class="modal-footer float-right">
+  <button class="btn btn-sm btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+</div>

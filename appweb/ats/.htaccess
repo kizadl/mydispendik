@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^logout.html$ logout.php [L]
+
+RewriteRule ^dashboard.html$ halaman.php?module=dashboard [L]
+RewriteRule ^laporan-survei.html$ laporan-survei.php?module=laporan-survei [L]
+
+RewriteRule ^koordinator.html$ halaman.php?module=koordinator [L]
+RewriteRule ^surveyor.html$ halaman.php?module=surveyor [L]
+RewriteRule ^operator-desk.html$ halaman.php?module=desk [L]
+RewriteRule ^universitas.html$ halaman.php?module=universitas [L]
+RewriteRule ^fakultas.html$ halaman.php?module=fakultas [L]
+
+RewriteRule ^koordinator-surveyor.html$ halaman.php?module=pengaturan-koordinator [L]
+RewriteRule ^surveyor-ats.html$ halaman.php?module=pengaturan-surveyor [L]
+RewriteRule ^survei-ats.html$ halaman.php?module=survei-ats [L]
+
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes
